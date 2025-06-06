@@ -1,0 +1,77 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_NAME: Reload Feedback
+      MODRINTH_ID: KmRgBUgi
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Variables
+        run: |
+          echo "VERSION=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+
+          echo "VERSION_NO_V=${VERSION#v}" >> "$GITHUB_ENV"
+
+          DATAPACK_FOLDER="${PROJECT_NAME}"
+          echo "DATAPACK_FOLDER=$DATAPACK_FOLDER" >> "$GITHUB_ENV"
+
+          DATAPACK_FILE="${PROJECT_NAME} ${GITHUB_REF_NAME}+pre_1.21.zip"
+          echo "DATAPACK_FILE=$DATAPACK_FILE" >> "$GITHUB_ENV"
+
+          DATAPACK_FILE_NO_SPACES="${DATAPACK_FILE// /-}"
+          echo "DATAPACK_FILE_NO_SPACES=$DATAPACK_FILE_NO_SPACES" >> "$GITHUB_ENV"
+
+      - name: Extract Changelog
+        id: changelog
+        run: |
+          changelog=$(awk "/^## \[${VERSION//./\\.}\]/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md)
+          changelog="${changelog//'%'/'%25'}"
+          echo "log<<EOF" >> "$GITHUB_OUTPUT"
+          echo "${changelog}" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Zip Data Pack
+        run: |
+          cd "src/${DATAPACK_FOLDER}"
+          zip -r "$OLDPWD/${DATAPACK_FILE}" ./*
+          cp "$OLDPWD/${DATAPACK_FILE}" "$OLDPWD/${DATAPACK_FILE_NO_SPACES}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ env.DATAPACK_FILE_NO_SPACES }}
+          body: ${{ steps.changelog.outputs.log }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish Datapack
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ env.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          name: ${{ env.PROJECT_NAME }} ${{ env.VERSION }}
+          version: ${{ env.VERSION_NO_V }}
+          loaders: |
+            datapack
+          game-version-filter: releases
+          game-versions: |
+            [1.13,1.21)
+          changelog: ${{ steps.changelog.outputs.log }}
+          files: |
+            ${{ env.DATAPACK_FILE }}
