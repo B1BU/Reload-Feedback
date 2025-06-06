@@ -71,7 +71,7 @@ jobs:
             datapack
           game-version-filter: releases
           game-versions: |
-            [1.13,1.21)
+            [1.21,]
           changelog: ${{ steps.changelog.outputs.log }}
           files: |
             ${{ env.DATAPACK_FILE }}
