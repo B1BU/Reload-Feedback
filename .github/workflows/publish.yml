@@ -29,7 +29,7 @@ jobs:
           DATAPACK_FOLDER="${PROJECT_NAME}"
           echo "DATAPACK_FOLDER=$DATAPACK_FOLDER" >> "$GITHUB_ENV"
 
-          DATAPACK_FILE="${PROJECT_NAME} ${GITHUB_REF_NAME}+pre_1.21.zip"
+          DATAPACK_FILE="${PROJECT_NAME} ${GITHUB_REF_NAME}+post_1.21.zip"
           echo "DATAPACK_FILE=$DATAPACK_FILE" >> "$GITHUB_ENV"
 
           DATAPACK_FILE_NO_SPACES="${DATAPACK_FILE// /-}"
@@ -71,7 +71,7 @@ jobs:
             datapack
           game-version-filter: releases
           game-versions: |
-            [1.13,1.21)
+            [1.21,]
           changelog: ${{ steps.changelog.outputs.log }}
           files: |
             ${{ env.DATAPACK_FILE }}
