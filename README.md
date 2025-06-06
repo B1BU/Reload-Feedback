@@ -1,0 +1,1 @@
+This lightweight datapack simply adds a feedback message to the `/reload` command
