@@ -29,7 +29,7 @@ jobs:
           DATAPACK_FOLDER="${PROJECT_NAME}"
           echo "DATAPACK_FOLDER=$DATAPACK_FOLDER" >> "$GITHUB_ENV"
 
-          DATAPACK_FILE="${PROJECT_NAME} ${GITHUB_REF_NAME}.zip"
+          DATAPACK_FILE="${PROJECT_NAME} ${GITHUB_REF_NAME}+pre_1.21.zip"
           echo "DATAPACK_FILE=$DATAPACK_FILE" >> "$GITHUB_ENV"
 
           DATAPACK_FILE_NO_SPACES="${DATAPACK_FILE// /-}"
@@ -67,13 +67,11 @@ jobs:
 
           name: ${{ env.PROJECT_NAME }} ${{ env.VERSION }}
           version: ${{ env.VERSION_NO_V }}
-          version-type: beta
           loaders: |
             datapack
-          dependencies: |
-            cobblemon
+          game-version-filter: releases
           game-versions: |
-            [,1.21)
+            [1.13,1.21)
           changelog: ${{ steps.changelog.outputs.log }}
           files: |
             ${{ env.DATAPACK_FILE }}
