@@ -1,0 +1,14 @@
+{
+	"pack": {
+		"pack_format": 48,
+		"description": {
+			"translate": "Made by %s",
+			"with": [
+				{
+					"text": "B1BU",
+					"color": "#D9FF00"
+				}
+			]
+		}
+	}
+}
