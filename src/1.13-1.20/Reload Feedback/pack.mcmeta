@@ -1,14 +1,9 @@
 {
 	"pack": {
 		"pack_format": 15,
-		"description": {
-			"translate": "Made by %s",
-			"with": [
-				{
-					"text": "B1BU",
-					"color": "#D9FF00"
-				}
-			]
-		}
+		"description": [
+			"Adds a basic feedback message to the reload command",
+			{"translate": " | %s", "with": [{"text": "B1BU","color": "#ACCC00"}]}
+		]
 	}
 }
