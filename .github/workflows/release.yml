@@ -26,7 +26,7 @@ jobs:
           VERSION="${TAG##*/}"
           VERSION_RANGE="${TAG%%/*}"
 
-          RELEASE_NAME="$PROJECT_NAME $VERSION_RANGE for Minecraft $VERSION"
+          RELEASE_NAME="$PROJECT_NAME $VERSION for Minecraft $VERSION_RANGE"
 
           SOURCE_FOLDER="src/$VERSION_RANGE/$PROJECT_NAME"
 
