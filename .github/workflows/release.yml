@@ -1,4 +1,4 @@
-name: Publish
+name: Release
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
 
     env:
@@ -19,9 +19,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - SOURCE_FOLDER: src/1.13-1.21/Reload Feedback
+          - VERSION_RANGE: 1.13-1.20
             GAME_VERSIONS: "[1.13,1.21)"
-          - SOURCE_FOLDER: src/1.21+/Reload Feedback
+          - VERSION_RANGE: 1.21+
             GAME_VERSIONS: "[1.21,]"
 
     steps:
@@ -32,13 +32,16 @@ jobs:
         run: |
           VERSION=${GITHUB_REF_NAME#v}
 
-          SOURCE_FOLDER="${{ matrix.SOURCE_FOLDER }}"
+          RELEASE_NAME="[${{ matrix.VERSION_RANGE }}] ${PROJECT_NAME} ${VERSION}"
+
+          SOURCE_FOLDER="src/${{ matrix.VERSION_RANGE }}/${PROJECT_NAME}"
 
           OUTPUT_FILE_BASENAME="${PROJECT_NAME} v${VERSION}"
           OUTPUT_FILE_MODRINTH="${OUTPUT_FILE_BASENAME}.zip"
           OUTPUT_FILE_GITHUB="${OUTPUT_FILE_BASENAME// /-}.zip"
 
           echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "RELEASE_NAME=${RELEASE_NAME}" >> "$GITHUB_ENV"
           echo "SOURCE_FOLDER=${SOURCE_FOLDER}" >> "$GITHUB_ENV"
           echo "OUTPUT_FILE_MODRINTH=${OUTPUT_FILE_MODRINTH}" >> "$GITHUB_ENV"
           echo "OUTPUT_FILE_GITHUB=${OUTPUT_FILE_GITHUB}" >> "$GITHUB_ENV"
@@ -46,7 +49,7 @@ jobs:
       - name: Extract Changelog
         id: changelog
         run: |
-          changelog=$(awk "/^## \[v${VERSION//./\\.}\]/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md)
+          changelog=$(awk "/^## \[${VERSION//./\\.}\]/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md)
           changelog="${changelog//'%'/'%25'}"
 
           if [ -z "$changelog" ]; then
@@ -69,17 +72,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: ${{ env.OUTPUT_FILE_GITHUB }}
+          name: ${{ env.RELEASE_NAME }}
           body: ${{ steps.changelog.outputs.log }}
+          files: ${{ env.OUTPUT_FILE_GITHUB }}
 
-      # - name: Publish Data Pack
+      # - name: Create Modrinth Release
       #   uses: Kir-Antipov/mc-publish@v3.3
       #   with:
       #     modrinth-id: ${{ env.MODRINTH_ID }}
       #     modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
-      #     name: ${{ env.PROJECT_NAME }} v${{ env.VERSION }}
       #     version: ${{ env.VERSION }}
+      #     name: ${{ env.RELEASE_NAME }}
       #     changelog: ${{ steps.changelog.outputs.log }}
       #     files: ${{ env.OUTPUT_FILE_MODRINTH }}
 
