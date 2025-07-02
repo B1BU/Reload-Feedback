@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - '*|*' # Matches tags like 1.0.0|1.13-1.20
+      - '*/*' # Matches tags like 1.13-1.20/1.0.0
 
 permissions:
   contents: write
@@ -23,8 +23,8 @@ jobs:
       - name: Set Variables
         run: |
           TAG="$GITHUB_REF_NAME"
-          VERSION="${TAG%%|*}"
-          VERSION_RANGE="${TAG##*|}"
+          VERSION="${TAG##*/}"
+          VERSION_RANGE="${TAG%%/*}"
 
           RELEASE_NAME="$PROJECT_NAME $VERSION_RANGE for Minecraft $VERSION"
 
