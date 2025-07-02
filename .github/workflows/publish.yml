@@ -30,8 +30,6 @@ jobs:
 
       - name: Set Variables
         run: |
-          set -euo pipefail
-
           VERSION=${GITHUB_REF_NAME#v}
 
           SOURCE_FOLDER="${{ matrix.SOURCE_FOLDER }}"
@@ -48,8 +46,6 @@ jobs:
       - name: Extract Changelog
         id: changelog
         run: |
-          set -euo pipefail
-
           changelog=$(awk "/^## \[v${VERSION//./\\.}\]/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md)
           changelog="${changelog//'%'/'%25'}"
 
@@ -64,11 +60,9 @@ jobs:
       - name: Zip Source Folder
         working-directory: ${{ env.SOURCE_FOLDER }}
         run: |
-          set -euo pipefail
-
-          zip -r "output" ./*
-          cp "output" "$GITHUB_WORKSPACE/${{ env.OUTPUT_FILE_MODRINTH }}"
-          cp "output" "$GITHUB_WORKSPACE/${{ env.OUTPUT_FILE_GITHUB }}"
+          zip -r "output.zip" ./*
+          cp "output.zip" "$GITHUB_WORKSPACE/${{ env.OUTPUT_FILE_MODRINTH }}.zip"
+          cp "output.zip" "$GITHUB_WORKSPACE/${{ env.OUTPUT_FILE_GITHUB }}.zip"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
