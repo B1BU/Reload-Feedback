@@ -2,7 +2,7 @@
 	"pack": {
 		"pack_format": 15,
 		"description": [
-			"Adds a basic feedback message to the reload command",
+			"Reload command feedback\nIgnore version warning",
 			{"translate": " | %s", "with": [{"text": "B1BU","color": "#ACCC00"}]}
 		]
 	}
