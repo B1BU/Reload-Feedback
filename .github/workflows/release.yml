@@ -64,8 +64,8 @@ jobs:
         working-directory: ${{ env.SOURCE_FOLDER }}
         run: |
           zip -r "output.zip" ./*
-          cp "output.zip" "$GITHUB_WORKSPACE/${{ env.OUTPUT_FILE_MODRINTH }}.zip"
-          cp "output.zip" "$GITHUB_WORKSPACE/${{ env.OUTPUT_FILE_GITHUB }}.zip"
+          cp "output.zip" "$GITHUB_WORKSPACE/${{ env.OUTPUT_FILE_MODRINTH }}"
+          cp "output.zip" "$GITHUB_WORKSPACE/${{ env.OUTPUT_FILE_GITHUB }}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
