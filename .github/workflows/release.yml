@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - '*|*' # Matches tags like 1.0.0|1.13-1.20
 
 permissions:
   contents: write
@@ -16,48 +16,61 @@ jobs:
       PROJECT_NAME: Reload Feedback
       MODRINTH_ID: KmRgBUgi
 
-    strategy:
-      matrix:
-        include:
-          - VERSION_RANGE: 1.13-1.20
-            GAME_VERSIONS: "[1.13,1.21)"
-          - VERSION_RANGE: 1.21+
-            GAME_VERSIONS: "[1.21,]"
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set Variables
         run: |
-          VERSION=${GITHUB_REF_NAME#v}
+          TAG="$GITHUB_REF_NAME"
+          VERSION="${TAG%%|*}"
+          VERSION_RANGE="${TAG##*|}"
 
-          RELEASE_NAME="[${{ matrix.VERSION_RANGE }}] ${PROJECT_NAME} ${VERSION}"
+          RELEASE_NAME="$PROJECT_NAME $VERSION_RANGE for Minecraft $VERSION"
 
-          SOURCE_FOLDER="src/${{ matrix.VERSION_RANGE }}/${PROJECT_NAME}"
+          SOURCE_FOLDER="src/$VERSION_RANGE/$PROJECT_NAME"
 
-          OUTPUT_FILE_BASENAME="${PROJECT_NAME} v${VERSION}"
-          OUTPUT_FILE_MODRINTH="${OUTPUT_FILE_BASENAME}.zip"
+          OUTPUT_FILE_BASENAME="$PROJECT_NAME v$VERSION"
+          OUTPUT_FILE_MODRINTH="$OUTPUT_FILE_BASENAME.zip"
           OUTPUT_FILE_GITHUB="${OUTPUT_FILE_BASENAME// /-}.zip"
 
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
-          echo "RELEASE_NAME=${RELEASE_NAME}" >> "$GITHUB_ENV"
-          echo "SOURCE_FOLDER=${SOURCE_FOLDER}" >> "$GITHUB_ENV"
-          echo "OUTPUT_FILE_MODRINTH=${OUTPUT_FILE_MODRINTH}" >> "$GITHUB_ENV"
-          echo "OUTPUT_FILE_GITHUB=${OUTPUT_FILE_GITHUB}" >> "$GITHUB_ENV"
+          # Export variables
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "VERSION_RANGE=$VERSION_RANGE" >> "$GITHUB_ENV"
+          echo "RELEASE_NAME=$RELEASE_NAME" >> "$GITHUB_ENV"
+          echo "SOURCE_FOLDER=$SOURCE_FOLDER" >> "$GITHUB_ENV"
+          echo "OUTPUT_FILE_MODRINTH=$OUTPUT_FILE_MODRINTH" >> "$GITHUB_ENV"
+          echo "OUTPUT_FILE_GITHUB=$OUTPUT_FILE_GITHUB" >> "$GITHUB_ENV"
+
+      - name: Load Version-Specific Variables
+        run: |
+          if [ -f "src/$VERSION_RANGE/release.env" ]; then
+            set -a
+            source "src/$VERSION_RANGE/release.env"
+            set +a
+          else
+            echo "Error: src/$VERSION_RANGE/release.env not found."
+            exit 1
+          fi
+
+          echo "GAME_VERSIONS=$GAME_VERSIONS" >> "$GITHUB_ENV"
 
       - name: Extract Changelog
+        # Matches "## [1.0.0]\n..."
         id: changelog
         run: |
+          echo "Extracting changelog for version $VERSION..."
           changelog=$(awk "/^## \[${VERSION//./\\.}\]/ {flag=1; next} /^## / {flag=0} flag" CHANGELOG.md)
           changelog="${changelog//'%'/'%25'}"
+          changelog="${changelog//$'\r'/}"
 
           if [ -z "$changelog" ]; then
-            changelog="No changelog entry found for version ${VERSION}."
+            echo "No changelog entry found for version $VERSION."
+            changelog="No changelog entry found for version $VERSION."
           fi
 
           echo "log<<EOF" >> "$GITHUB_OUTPUT"
-          echo "${changelog}" >> "$GITHUB_OUTPUT"
+          echo "$changelog" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Zip Source Folder
@@ -76,19 +89,19 @@ jobs:
           body: ${{ steps.changelog.outputs.log }}
           files: ${{ env.OUTPUT_FILE_GITHUB }}
 
-      # - name: Create Modrinth Release
-      #   uses: Kir-Antipov/mc-publish@v3.3
-      #   with:
-      #     modrinth-id: ${{ env.MODRINTH_ID }}
-      #     modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+      - name: Create Modrinth Release
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ env.MODRINTH_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
-      #     version: ${{ env.VERSION }}
-      #     name: ${{ env.RELEASE_NAME }}
-      #     changelog: ${{ steps.changelog.outputs.log }}
-      #     files: ${{ env.OUTPUT_FILE_MODRINTH }}
+          version: ${{ env.VERSION }}
+          name: ${{ env.RELEASE_NAME }}
+          changelog: ${{ steps.changelog.outputs.log }}
+          files: ${{ env.OUTPUT_FILE_MODRINTH }}
 
-      #     loaders: datapack
-      #     version-type: release
+          loaders: datapack
+          version-type: release
 
-      #     game-version-filter: releases
-      #     game-versions: ${{ matrix.GAME_VERSIONS }}
+          game-version-filter: releases
+          game-versions: ${{ env.GAME_VERSIONS }}
