@@ -15,6 +15,7 @@ jobs:
     env:
       PROJECT_NAME: Reload Feedback
       MODRINTH_ID: KmRgBUgi
+      VERSION_TYPE: release
 
     steps:
       - name: Checkout code
@@ -26,7 +27,7 @@ jobs:
           VERSION="${TAG##*/}"
           VERSION_RANGE="${TAG%%/*}"
 
-          RELEASE_NAME="$PROJECT_NAME $VERSION for Minecraft $VERSION_RANGE"
+          RELEASE_NAME="[$VERSION_RANGE] $PROJECT_NAME $VERSION"
 
           SOURCE_FOLDER="src/$VERSION_RANGE/$PROJECT_NAME"
 
@@ -53,7 +54,14 @@ jobs:
             exit 1
           fi
 
+          # Warn if GAME_VERSIONS is not set
+          if [ -z "$GAME_VERSIONS" ]; then
+            echo "Error: GAME_VERSIONS is required."
+            exit 1
+          fi
+
           echo "GAME_VERSIONS=$GAME_VERSIONS" >> "$GITHUB_ENV"
+          echo "VERSION_TYPE=$VERSION_TYPE" >> "$GITHUB_ENV"
 
       - name: Extract Changelog
         # Matches "## [1.0.0]\n..."
@@ -66,7 +74,7 @@ jobs:
 
           if [ -z "$changelog" ]; then
             echo "No changelog entry found for version $VERSION."
-            changelog="No changelog entry found for version $VERSION."
+            changelog=""
           fi
 
           echo "log<<EOF" >> "$GITHUB_OUTPUT"
@@ -101,7 +109,7 @@ jobs:
           files: ${{ env.OUTPUT_FILE_MODRINTH }}
 
           loaders: datapack
-          version-type: release
+          version-type: ${{ env.VERSION_TYPE }}
 
           game-version-filter: releases
           game-versions: ${{ env.GAME_VERSIONS }}
