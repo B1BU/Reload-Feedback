@@ -19,9 +19,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - SOURCE_FOLDER: src/1.13-1.21/${{ env.PROJECT_NAME }}
+          - SOURCE_FOLDER: src/1.13-1.21/Reload Feedback
             GAME_VERSIONS: "[1.13,1.21)"
-          - SOURCE_FOLDER: src/1.21+/${{ env.PROJECT_NAME }}
+          - SOURCE_FOLDER: src/1.21+/Reload Feedback
             GAME_VERSIONS: "[1.21,]"
 
     steps:
