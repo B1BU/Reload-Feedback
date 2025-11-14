@@ -1,0 +1,1 @@
+return run gamerule send_command_feedback

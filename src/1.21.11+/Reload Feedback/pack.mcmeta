@@ -1,0 +1,13 @@
+{
+	"pack": {
+		"pack_format": 88,
+		"supported_formats": {
+			"min_inclusive": 88,
+			"max_inclusive": 2147483647
+		},
+		"description": [
+			"Feedback for the reload command",
+			{"translate": " [%s]", "with": [{"text": "B1BU","color": "#ACCC00"}]}
+		]
+	}
+}
