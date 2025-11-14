@@ -4,7 +4,7 @@ This data pack adds a very basic feedback message to the `/reload` command witho
 
 ***
 
-The datapack should work for all Minecraft versions, as long as you download the correct file, disregard the datapack version warning
+The data pack version is supposed to be compatible with all minecraft versions as long as you pick the correct file. If the game gives you a version warning, just ignore it
 
 ***
 
