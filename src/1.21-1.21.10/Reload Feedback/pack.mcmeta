@@ -2,8 +2,8 @@
 	"pack": {
 		"pack_format": 48,
 		"supported_formats": {
-			"min_inclusive": 48,
-			"max_inclusive": 2147483647
+			"min_inclusive": 43,
+			"max_inclusive": 87
 		},
 		"description": [
 			"Feedback for the reload command",

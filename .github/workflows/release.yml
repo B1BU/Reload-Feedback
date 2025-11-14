@@ -20,7 +20,7 @@ jobs:
 
       LOADERS: datapack
 
-      GAME_VERSION_FILTER: releases
+      GAME_VERSION_FILTER: any
 
       DEPENDENCIES: ""
 
