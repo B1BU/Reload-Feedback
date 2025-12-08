@@ -1,3 +1,6 @@
+## [1.0.4]
+- Changed game version ranges
+
 ## [1.0.3]
 - Added support for snapshots
 

@@ -1,9 +1,9 @@
 {
 	"pack": {
-		"pack_format": 48,
+		"pack_format": 44,
 		"supported_formats": {
-			"min_inclusive": 43,
-			"max_inclusive": 87
+			"min_inclusive": 0,
+			"max_inclusive": 44
 		},
 		"description": [
 			"Feedback for the reload command",
