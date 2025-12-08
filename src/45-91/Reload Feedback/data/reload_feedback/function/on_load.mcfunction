@@ -1,1 +1,1 @@
-execute if loaded ~ ~ ~ if function reload_feedback:is_send_command_feedback_true run tellraw @a "Reloaded!"
+execute if function reload_feedback:is_send_command_feedback_true run tellraw @a "Reloaded!"
